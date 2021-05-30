@@ -1,5 +1,7 @@
 # CuteKeys
 
+![CuteKeys Screenshot](screenshot.png)
+
 ## Description
 
 Small toyproject to learn some Qt and QML.

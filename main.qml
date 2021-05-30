@@ -12,42 +12,65 @@ Window {
 
     //signal noteOn(number idx);
     //signal noteOff(number noteIdx);
-
-    RowLayout {
-        anchors.top: parent.top;
+    Column {
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.margins: 10;
-        spacing: 15;
+        anchors.top: parent.top;
 
-        NoteButton {
-            id: noteC
-            noteIndex: 0
+        Text {
+            id: header;
+            anchors.top: parent.top;
+            horizontalAlignment: Text.AlignHCenter
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            text: object.text
         }
-        NoteButton {
-            id: noteD
-            noteIndex: 1
-        }
-        NoteButton {
-            id: noteE
-            noteIndex: 2
-        }
-        NoteButton {
-            id: noteF
-            noteIndex: 3
-        }
-        NoteButton {
-            id: noteG
-            noteIndex: 4
-        }
-        NoteButton {
-            id: noteA
-            noteIndex: 5
-        }
-        NoteButton {
-            id: noteH
-            noteIndex: 6
+
+        RowLayout {
+            anchors.top: header.bottom;
+            anchors.bottom: parent.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.margins: 10;
+            spacing: 15;
+
+            NoteButton {
+                id: noteC
+                noteIndex: 0
+                onNoteOn: {
+                    console.log("Note On: " + noteIndex);
+                    object.text = "Pressed Key " + noteIndex;
+                }
+                onNoteOff: {
+                    console.log("Note Off: " + noteIndex);
+                    object.text = "Released Key " + noteIndex;
+                }
+            }
+            NoteButton {
+                id: noteD
+                noteIndex: 1
+            }
+            NoteButton {
+                id: noteE
+                noteIndex: 2
+            }
+            NoteButton {
+                id: noteF
+                noteIndex: 3
+            }
+            NoteButton {
+                id: noteG
+                noteIndex: 4
+            }
+            NoteButton {
+                id: noteA
+                noteIndex: 5
+            }
+            NoteButton {
+                id: noteH
+                noteIndex: 6
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ import QtGraphicalEffects 1.12
 Rectangle {
     readonly property var noteNames: ["C", "D", "E", "F", "G", "A", "H"];
 
-    id: button;
+    id: root;
 
     Layout.fillWidth: true;
     Layout.fillHeight: true;
@@ -14,8 +14,8 @@ Rectangle {
     color: "#999999"
     radius: 5
     property var noteIndex: 0;
-    signal noteOn(int idx);
-    signal noteOff(int idx);
+    signal noteOn(int noteIdx);
+    signal noteOff(int noteIdx);
 
     border.color: "#333333"
     gradient: Gradient {
@@ -49,11 +49,16 @@ Rectangle {
     MouseArea {
         id: mouseArea;
         anchors.fill: parent;
+        onClicked: {
+            console.log("Clicked");
+        }
         onPressed: {
-            noteOn(noteIndex);
+            console.log("Pressed", noteIndex);
+            root.noteOn(noteIndex);
         }
         onReleased: {
-            noteOff(noteIndex);
+            console.log("Released", noteIndex);
+            root.noteOff(noteIndex);
         }
     }
 
