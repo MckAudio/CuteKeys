@@ -8,8 +8,10 @@ CONFIG += console
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        audiohandler.cpp \
         main.cpp \
-        nativeobject.cpp
+        nativeobject.cpp \
+        synthtone.cpp
 
 RESOURCES += qml.qrc
 
@@ -28,4 +30,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    nativeobject.h
+    audiohandler.h \
+    nativeobject.h \
+    synthtone.h
+
+QMAKE_LINK += -lrtaudio
