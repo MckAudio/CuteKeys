@@ -8,10 +8,10 @@ SynthVoice::SynthVoice()
     , m_bufferSize(0)
     , m_frequency(400.0)
     , m_gainLin(0.1)
-    , m_attackMs(100)
-    , m_attackSamps(0)
-    , m_releaseMs(1000)
-    , m_releaseSamps(0)
+    , m_attackMs(0)
+    , m_attackSamps(1)
+    , m_releaseMs(0)
+    , m_releaseSamps(1)
     , m_envelope(1.0)
     , m_character(0.0)
     , m_noteState(ADSR_IDLE)
@@ -52,12 +52,12 @@ bool SynthVoice::NoteOn(double frequency, double gainLin, unsigned int attackMs,
     if (attackMs != m_attackMs)
     {
         m_attackMs = std::min(std::max(attackMs, (unsigned)0), (unsigned)8000);
-        m_attackSamps = (double)m_attackMs * 1000.0 / (double)m_sampleRate;
+        m_attackSamps = std::max((unsigned) 1, (unsigned)std::round((double)m_attackMs / 1000.0 * (double)m_sampleRate));
     }
     if (releaseMs != m_releaseMs)
     {
         m_releaseMs = std::min(std::max(releaseMs, (unsigned)0), (unsigned)8000);
-        m_releaseSamps = (double)m_releaseMs * 1000.0 / (double)m_sampleRate;
+        m_releaseSamps = std::max((unsigned) 1, (unsigned)std::round((double)m_releaseMs / 1000.0 * (double)m_sampleRate));
     }
 
     m_noteState = ADSR_ATTACK;
@@ -76,7 +76,7 @@ bool SynthVoice::NoteOff()
 
     if (m_noteState.load() <= ADSR_SUSTAIN)
     {
-        m_noteState = ADSR_SUSTAIN;
+        m_noteState = ADSR_RELEASE;
     }
 
     return true;
@@ -86,12 +86,14 @@ bool SynthVoice::ProcessAdd(double *buffer, unsigned numSamples)
 {
     double p = 0.0;
     unsigned phaseLen = std::floor((double) m_sampleRate / m_frequency.load());
-    double masterGain = m_gainLin.load();
-    double gain = 0.0;
+    double gain = m_gainLin.load();
     char state = m_noteState.load();
 
     unsigned attackSamps = m_attackSamps.load();
     unsigned releaseSamps = m_releaseSamps.load();
+
+    unsigned phaseIdx = m_phaseIdx.load();
+    unsigned stateIdx = m_stateIdx.load();
 
 
     for (unsigned i = 0; i < numSamples; i++)
@@ -99,40 +101,41 @@ bool SynthVoice::ProcessAdd(double *buffer, unsigned numSamples)
         switch(state)
         {
         case ADSR_ATTACK:
-            gain = (double)m_stateIdx / (double)attackSamps;
-            m_stateIdx++;
-            if (m_stateIdx >= m_attackSamps)
+            m_envelope = (double)stateIdx / (double)attackSamps;
+            stateIdx++;
+            if (stateIdx >= m_attackSamps)
             {
-                m_stateIdx = 0;
+                stateIdx = 0;
                 state = ADSR_SUSTAIN;
             }
             break;
         case ADSR_DECAY:
-            gain = 1.0;
+            m_envelope = 1.0;
             break;
         case ADSR_SUSTAIN:
-            gain = 1.0;
+            m_envelope = 1.0;
             break;
         case ADSR_RELEASE:
-            gain = 1.0 - (double)m_stateIdx / (double)releaseSamps;
-            m_stateIdx++;
-            if (m_stateIdx >= m_releaseSamps)
+            m_envelope = 1.0 - (double)stateIdx / (double)releaseSamps;
+            stateIdx++;
+            if (stateIdx >= m_releaseSamps)
             {
-                m_stateIdx = 0;
+                stateIdx = 0;
                 state= ADSR_IDLE;
             }
             break;
         default:
-            gain = 0.0;
+            m_envelope = 0.0;
             break;
         }
 
-        p = 2.0 * M_PI * (double)m_phaseIdx / (double)phaseLen;
-        buffer[i] += gain * masterGain * std::sin(p);
-        m_phaseIdx = (m_phaseIdx + 1) % phaseLen;
+        p = 2.0 * M_PI * (double)phaseIdx / (double)phaseLen;
+        buffer[i] += m_envelope * gain * std::sin(p);
+        phaseIdx = (phaseIdx + 1) % phaseLen;
     }
 
     m_noteState = state;
-
+    m_phaseIdx = phaseIdx;
+    m_stateIdx = stateIdx;
     return 0;
 }

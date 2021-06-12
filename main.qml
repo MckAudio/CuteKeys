@@ -6,7 +6,7 @@ import QtQuick.Controls 2.12
 
 Window {
     width: 600
-    height: 250
+    height: 350
     visible: true
     title: qsTr("CuteKeys")
     color: "#eeeeee"
@@ -50,9 +50,53 @@ Window {
             verticalAlignment: Text.AlignVCenter
             text: audio.gain.toFixed(1) + " dB";
         }
+        Slider {
+            id: attackSlider;
+            anchors.top: gainSlider.bottom;
+            anchors.left: parent.left;
+            anchors.right: attackLabel.left;
+            anchors.leftMargin: 10;
+            anchors.rightMargin: 10;
+            stepSize: 1
+            to: 2000
+            from: 0
+            value: audio.attack;
+            onValueChanged: audio.attack = value;
+        }
+
+        Text {
+            id: attackLabel;
+            anchors.top: gainSlider.bottom;
+            anchors.right: parent.right;
+            width: 100;
+            verticalAlignment: Text.AlignVCenter
+            text: audio.attack.toString() + " ms";
+        }
+        Slider {
+            id: releaseSlider;
+            anchors.top: attackSlider.bottom;
+            anchors.left: parent.left;
+            anchors.right: releaseLabel.left;
+            anchors.leftMargin: 10;
+            anchors.rightMargin: 10;
+            stepSize: 1
+            to: 2000
+            from: 0
+            value: audio.release;
+            onValueChanged: audio.release = value;
+        }
+
+        Text {
+            id: releaseLabel;
+            anchors.top: attackSlider.bottom;
+            anchors.right: parent.right;
+            width: 100;
+            verticalAlignment: Text.AlignVCenter
+            text: audio.release.toString() + " ms";
+        }
 
         RowLayout {
-            anchors.top: gainSlider.bottom;
+            anchors.top: releaseSlider.bottom;
             anchors.bottom: parent.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
@@ -63,37 +107,71 @@ Window {
                 id: noteC
                 noteIndex: 0
                 onNoteOn: {
-                    console.log("Note On: " + noteIndex);
-                    header.text = "Pressed Key " + noteIndex;
+                    audio.noteOn(noteIndex);
                 }
                 onNoteOff: {
-                    console.log("Note Off: " + noteIndex);
-                    header.text = "Released Key " + noteIndex;
+                    audio.noteOff(noteIndex);
                 }
             }
             NoteButton {
                 id: noteD
                 noteIndex: 1
+                onNoteOn: {
+                    audio.noteOn(noteIndex);
+                }
+                onNoteOff: {
+                    audio.noteOff(noteIndex);
+                }
             }
             NoteButton {
                 id: noteE
                 noteIndex: 2
+                onNoteOn: {
+                    audio.noteOn(noteIndex);
+                }
+                onNoteOff: {
+                    audio.noteOff(noteIndex);
+                }
             }
             NoteButton {
                 id: noteF
                 noteIndex: 3
+                onNoteOn: {
+                    audio.noteOn(noteIndex);
+                }
+                onNoteOff: {
+                    audio.noteOff(noteIndex);
+                }
             }
             NoteButton {
                 id: noteG
                 noteIndex: 4
+                onNoteOn: {
+                    audio.noteOn(noteIndex);
+                }
+                onNoteOff: {
+                    audio.noteOff(noteIndex);
+                }
             }
             NoteButton {
                 id: noteA
                 noteIndex: 5
+                onNoteOn: {
+                    audio.noteOn(noteIndex);
+                }
+                onNoteOff: {
+                    audio.noteOff(noteIndex);
+                }
             }
             NoteButton {
                 id: noteH
                 noteIndex: 6
+                onNoteOn: {
+                    audio.noteOn(noteIndex);
+                }
+                onNoteOff: {
+                    audio.noteOff(noteIndex);
+                }
             }
         }
     }

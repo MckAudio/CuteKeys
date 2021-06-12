@@ -23,9 +23,10 @@ AudioHandler::AudioHandler(QObject *parent)
     , m_frequency(440.0)
     , m_gain(-6.0)
     , m_gainLin(0.1)
+    , m_attack(100)
+    , m_release(1000)
     , m_buffer(nullptr)
 {
-    emit GainChanged();
 }
 
 AudioHandler::~AudioHandler()
@@ -75,21 +76,26 @@ bool AudioHandler::Init()
     unsigned outIdx = m_audio.getDefaultOutputDevice();
     m_voices.resize(4);
 
-    m_initialized = OpenInterface(outIdx);
-
     m_buffer = (double *) malloc(m_bufferSize * sizeof(double));
     memset(m_buffer, 0, m_bufferSize * sizeof(double));
 
+    m_initialized = OpenInterface(outIdx);
+
     for(auto &v : m_voices)
     {
-        v = new SynthVoice();
-        v->Init(m_sampleRate, m_bufferSize);
+        v.first = -1;
+        v.second = new SynthVoice();
+        v.second->Init(m_sampleRate, m_bufferSize);
     }
     return m_initialized;
 }
 
 void AudioHandler::ProcessAudio(double *buffer, unsigned int numSamples)
 {
+    if (m_initialized == false)
+    {
+        return;
+    }
 
     double p = 0.0;
 
@@ -97,7 +103,7 @@ void AudioHandler::ProcessAudio(double *buffer, unsigned int numSamples)
 
     for (auto &v : m_voices)
     {
-        v->ProcessAdd(m_buffer, m_bufferSize);
+        v.second->ProcessAdd(m_buffer, m_bufferSize);
     }
 
     if (m_numChannels == 0)
@@ -106,8 +112,8 @@ void AudioHandler::ProcessAudio(double *buffer, unsigned int numSamples)
     } else {
         for (unsigned i = 0; i < std::min(numSamples, m_bufferSize); i++)
         {
-            buffer[i*2] = buffer[i];
-            buffer[i*2+1] = buffer[i];
+            buffer[i*2] = m_buffer[i];
+            buffer[i*2+1] = m_buffer[i];
         }
     }
 }
@@ -118,6 +124,44 @@ void AudioHandler::SetGain(double gain)
     m_gainLin = DbToLin(m_gain);
 
     emit GainChanged();
+}
+void AudioHandler::SetAttack(unsigned int attack)
+{
+    m_attack = attack;
+    emit AttackChanged();
+}
+void AudioHandler::SetRelease(unsigned int release)
+{
+    m_release = release;
+    emit ReleaseChanged();
+}
+
+void AudioHandler::noteOn(unsigned note)
+{
+    note = std::min(note, (unsigned) 6);
+    for (auto &v : m_voices)
+    {
+        if (v.second->IsIdle())
+        {
+            if (v.second->NoteOn(frequencies[note], m_gainLin.load(), m_attack.load(), m_release.load())) {
+                v.first = note;
+                break;
+            }
+        }
+    }
+}
+
+void AudioHandler::noteOff(unsigned note)
+{
+    for (auto &v : m_voices)
+    {
+        if (v.first >= 0 && v.first == (int)note)
+        {
+            v.second->NoteOff();
+            v.first = -1;
+            break;
+        }
+    }
 }
 
 bool AudioHandler::OpenInterface(unsigned int idx)
