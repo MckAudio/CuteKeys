@@ -5,6 +5,9 @@
 #include <QObject>
 #include <rtaudio/RtAudio.h>
 
+
+class SynthVoice;
+
 class AudioHandler : public QObject
 {
     Q_OBJECT
@@ -41,6 +44,9 @@ private:
     RtAudio m_audio;
     std::vector<RtAudio::DeviceInfo> m_devices;
 
+    std::vector<SynthVoice*> m_voices;
+
+    double *m_buffer;
 };
 
 #endif // AUDIOHANDLER_H

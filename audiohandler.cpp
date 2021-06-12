@@ -1,4 +1,5 @@
 #include "audiohandler.h"
+#include "synthvoice.h"
 #include <cmath>
 
 int process(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void *userData)
@@ -22,6 +23,7 @@ AudioHandler::AudioHandler(QObject *parent)
     , m_frequency(440.0)
     , m_gain(-6.0)
     , m_gainLin(0.1)
+    , m_buffer(nullptr)
 {
     emit GainChanged();
 }
@@ -46,6 +48,12 @@ AudioHandler::~AudioHandler()
 
         m_initialized = false;
     }
+
+    if (m_buffer != nullptr)
+    {
+        free(m_buffer);
+        m_buffer = nullptr;
+    }
 }
 
 bool AudioHandler::Init()
@@ -65,28 +73,42 @@ bool AudioHandler::Init()
     }
 
     unsigned outIdx = m_audio.getDefaultOutputDevice();
+    m_voices.resize(4);
 
     m_initialized = OpenInterface(outIdx);
+
+    m_buffer = (double *) malloc(m_bufferSize * sizeof(double));
+    memset(m_buffer, 0, m_bufferSize * sizeof(double));
+
+    for(auto &v : m_voices)
+    {
+        v = new SynthVoice();
+        v->Init(m_sampleRate, m_bufferSize);
+    }
     return m_initialized;
 }
 
 void AudioHandler::ProcessAudio(double *buffer, unsigned int numSamples)
 {
 
-    unsigned phaseLen = std::floor((double) m_sampleRate / m_frequency);
     double p = 0.0;
-    double gain = m_gainLin.load();
 
-    for (unsigned i = 0; i < numSamples; i++)
+    memset(m_buffer, 0, m_bufferSize * sizeof(double));
+
+    for (auto &v : m_voices)
     {
-        p = 2.0 * 3.14159 * (double)m_phaseIdx / (double)phaseLen;
-        if (m_numChannels > 1) {
-            buffer[i*2] = gain * std::sin(p);
-            buffer[i*2+1] = gain * std::sin(p);
-        } else {
-            buffer[i] = gain * std::sin(p);
+        v->ProcessAdd(m_buffer, m_bufferSize);
+    }
+
+    if (m_numChannels == 0)
+    {
+        memcpy(buffer, m_buffer, numSamples);
+    } else {
+        for (unsigned i = 0; i < std::min(numSamples, m_bufferSize); i++)
+        {
+            buffer[i*2] = buffer[i];
+            buffer[i*2+1] = buffer[i];
         }
-        m_phaseIdx = (m_phaseIdx + 1) % phaseLen;
     }
 }
 

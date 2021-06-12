@@ -11,7 +11,7 @@ SOURCES += \
         audiohandler.cpp \
         main.cpp \
         nativeobject.cpp \
-        synthtone.cpp
+        synthvoice.cpp
 
 RESOURCES += qml.qrc
 
@@ -32,6 +32,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     audiohandler.h \
     nativeobject.h \
-    synthtone.h
+    synthvoice.h
 
 QMAKE_LINK += -lrtaudio
