@@ -15,6 +15,8 @@ SynthVoice::SynthVoice()
     , m_envelope(1.0)
     , m_character(0.0)
     , m_noteState(ADSR_IDLE)
+    , m_noteOn(false)
+    , m_curNoteOn(false)
     , m_stateIdx(0)
     , m_phaseIdx(0)
 {
@@ -60,9 +62,7 @@ bool SynthVoice::NoteOn(double frequency, double gainLin, unsigned int attackMs,
         m_releaseSamps = std::max((unsigned) 1, (unsigned)std::round((double)m_releaseMs / 1000.0 * (double)m_sampleRate));
     }
 
-    m_noteState = ADSR_ATTACK;
-    m_stateIdx = 0;
-    m_phaseIdx = 0;
+    m_noteOn = true;
 
     return true;
 }
@@ -74,10 +74,7 @@ bool SynthVoice::NoteOff()
         return false;
     }
 
-    if (m_noteState.load() <= ADSR_SUSTAIN)
-    {
-        m_noteState = ADSR_RELEASE;
-    }
+    m_noteOn = false;
 
     return true;
 }
@@ -87,26 +84,42 @@ bool SynthVoice::ProcessAdd(double *buffer, unsigned numSamples)
     double p = 0.0;
     unsigned phaseLen = std::floor((double) m_sampleRate / m_frequency.load());
     double gain = m_gainLin.load();
-    char state = m_noteState.load();
 
     unsigned attackSamps = m_attackSamps.load();
     unsigned releaseSamps = m_releaseSamps.load();
 
-    unsigned phaseIdx = m_phaseIdx.load();
-    unsigned stateIdx = m_stateIdx.load();
+    bool noteOn = m_noteOn.load();
 
+    if (noteOn != m_curNoteOn)
+    {
+        if (noteOn)
+        {
+            m_noteState = ADSR_ATTACK;
+            m_stateIdx = 0;
+            m_phaseIdx = 0;
+        } else if (m_noteState == ADSR_SUSTAIN) {
+            m_noteState = ADSR_RELEASE;
+            m_stateIdx = 0;
+        } else {
+            // Memorise current state
+            double coeff = (double)m_stateIdx / (double)attackSamps;
+            m_stateIdx = (unsigned) std::floor((1.0 - coeff) * (double)releaseSamps);
+            m_noteState = ADSR_RELEASE;
+        }
+        m_curNoteOn = noteOn;
+    }
 
     for (unsigned i = 0; i < numSamples; i++)
     {
-        switch(state)
+        switch(m_noteState)
         {
         case ADSR_ATTACK:
-            m_envelope = (double)stateIdx / (double)attackSamps;
-            stateIdx++;
-            if (stateIdx >= m_attackSamps)
+            m_envelope = (double)m_stateIdx / (double)attackSamps;
+            m_stateIdx++;
+            if (m_stateIdx >= m_attackSamps)
             {
-                stateIdx = 0;
-                state = ADSR_SUSTAIN;
+                m_stateIdx = 0;
+                m_noteState = ADSR_SUSTAIN;
             }
             break;
         case ADSR_DECAY:
@@ -116,12 +129,12 @@ bool SynthVoice::ProcessAdd(double *buffer, unsigned numSamples)
             m_envelope = 1.0;
             break;
         case ADSR_RELEASE:
-            m_envelope = 1.0 - (double)stateIdx / (double)releaseSamps;
-            stateIdx++;
-            if (stateIdx >= m_releaseSamps)
+            m_envelope = 1.0 - (double)m_stateIdx / (double)releaseSamps;
+            m_stateIdx++;
+            if (m_stateIdx >= m_releaseSamps)
             {
-                stateIdx = 0;
-                state= ADSR_IDLE;
+                m_stateIdx = 0;
+                m_noteState = ADSR_IDLE;
             }
             break;
         default:
@@ -129,13 +142,9 @@ bool SynthVoice::ProcessAdd(double *buffer, unsigned numSamples)
             break;
         }
 
-        p = 2.0 * M_PI * (double)phaseIdx / (double)phaseLen;
+        p = 2.0 * M_PI * (double)m_phaseIdx / (double)phaseLen;
         buffer[i] += m_envelope * gain * std::sin(p);
-        phaseIdx = (phaseIdx + 1) % phaseLen;
+        m_phaseIdx = (m_phaseIdx + 1) % phaseLen;
     }
-
-    m_noteState = state;
-    m_phaseIdx = phaseIdx;
-    m_stateIdx = stateIdx;
     return 0;
 }

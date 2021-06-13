@@ -21,7 +21,7 @@ public:
     SynthVoice();
     ~SynthVoice();
     bool Init(unsigned sampleRate, unsigned bufferSize);
-    bool IsIdle() { return m_noteState.load() == ADSR_IDLE; };
+    bool IsIdle() { return m_noteState == ADSR_IDLE; };
 
     bool NoteOn(double frequency, double gainLin, unsigned attackMs = 100, unsigned releaseMs = 1000);
     bool NoteOff();
@@ -44,11 +44,13 @@ private:
 
     double m_character;
 
-    std::atomic<char> m_noteState; // 0 - Attack, 1 - Decay, 2 - Sustain, 3 - Release, 4 - None
-    std::atomic<unsigned> m_stateIdx;
+    char m_noteState; // 0 - Attack, 1 - Decay, 2 - Sustain, 3 - Release, 4 - None
+    std::atomic<bool> m_noteOn;
+    bool m_curNoteOn;
+    unsigned m_stateIdx;
 
     // Tone Generator
-    std::atomic<unsigned> m_phaseIdx;
+    unsigned m_phaseIdx;
 };
 
 #endif // SYNTHVOICE_H

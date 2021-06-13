@@ -13,94 +13,92 @@ Window {
 
     //signal noteOn(number idx);
     //signal noteOff(number noteIdx);
-    Column {
+    ColumnLayout {
         anchors.bottom: parent.bottom;
+        spacing: 10
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.top: parent.top;
+        anchors.margins: 10;
 
-        Text {
-            id: header;
-            anchors.top: parent.top;
-            horizontalAlignment: Text.AlignHCenter
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            text: object.text;
-        }
+        GridLayout {
+            id: controls
+            Layout.fillWidth: true;
+            columns: 3;
+            columnSpacing: 5;
+            Text {
+                Layout.preferredWidth: 80;
+                horizontalAlignment: Text.AlignRight;
+                text: "Gain:";
+            }
+            Slider {
+                Layout.fillWidth: true;
+                id: gainSlider;
+                stepSize: 0.1
+                to: 0
+                from: -60
+                value: audio.gain;
+                onValueChanged: audio.gain = value;
+            }
+            Text {
+                id: gainLabel;
+                Layout.preferredWidth: 80;
+                verticalAlignment: Text.AlignVCenter
+                text: audio.gain.toFixed(1) + " dB";
+            }
 
-        Slider {
-            id: gainSlider;
-            anchors.top: header.bottom;
-            anchors.left: parent.left;
-            anchors.right: gainLabel.left;
-            anchors.leftMargin: 10;
-            anchors.rightMargin: 10;
-            stepSize: 0.1
-            to: 0
-            from: -60
-            value: audio.gain;
-            onValueChanged: audio.gain = value;
-        }
+            Text {
+                Layout.preferredWidth: 80;
+                horizontalAlignment: Text.AlignRight;
+                text: "Attack:";
+            }
+            Slider {
+                Layout.fillWidth: true;
+                id: attackSlider;
+                stepSize: 1
+                to: 2000
+                from: 0
+                value: audio.attack;
+                onValueChanged: audio.attack = value;
+            }
+            Text {
+                id: attackLabel;
+                Layout.preferredWidth: 80;
+                verticalAlignment: Text.AlignVCenter
+                text: audio.attack.toString() + " ms";
+            }
 
-        Text {
-            id: gainLabel;
-            anchors.top: header.bottom;
-            anchors.right: parent.right;
-            width: 100;
-            verticalAlignment: Text.AlignVCenter
-            text: audio.gain.toFixed(1) + " dB";
-        }
-        Slider {
-            id: attackSlider;
-            anchors.top: gainSlider.bottom;
-            anchors.left: parent.left;
-            anchors.right: attackLabel.left;
-            anchors.leftMargin: 10;
-            anchors.rightMargin: 10;
-            stepSize: 1
-            to: 2000
-            from: 0
-            value: audio.attack;
-            onValueChanged: audio.attack = value;
-        }
-
-        Text {
-            id: attackLabel;
-            anchors.top: gainSlider.bottom;
-            anchors.right: parent.right;
-            width: 100;
-            verticalAlignment: Text.AlignVCenter
-            text: audio.attack.toString() + " ms";
-        }
-        Slider {
-            id: releaseSlider;
-            anchors.top: attackSlider.bottom;
-            anchors.left: parent.left;
-            anchors.right: releaseLabel.left;
-            anchors.leftMargin: 10;
-            anchors.rightMargin: 10;
-            stepSize: 1
-            to: 2000
-            from: 0
-            value: audio.release;
-            onValueChanged: audio.release = value;
-        }
-
-        Text {
-            id: releaseLabel;
-            anchors.top: attackSlider.bottom;
-            anchors.right: parent.right;
-            width: 100;
-            verticalAlignment: Text.AlignVCenter
-            text: audio.release.toString() + " ms";
+            Text {
+                Layout.preferredWidth: 80;
+                horizontalAlignment: Text.AlignRight;
+                text: "Release:";
+            }
+            Slider {
+                Layout.fillWidth: true;
+                id: releaseSlider;
+                stepSize: 1
+                to: 2000
+                from: 0
+                value: audio.release;
+                onValueChanged: audio.release = value;
+            }
+            Text {
+                id: releaseLabel;
+                Layout.preferredWidth: 80;
+                verticalAlignment: Text.AlignVCenter
+                text: audio.release.toString() + " ms";
+            }
         }
 
         RowLayout {
-            anchors.top: releaseSlider.bottom;
-            anchors.bottom: parent.bottom;
+            /*
             anchors.left: parent.left;
             anchors.right: parent.right;
-            anchors.margins: 10;
+            anchors.top: controls.bottom;
+            anchors.bottom: parent.bottom;
+            */
+            Layout.fillHeight: true;
+            Layout.fillWidth: true;
             spacing: 15;
 
             NoteButton {
