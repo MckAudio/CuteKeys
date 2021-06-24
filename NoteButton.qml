@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.3
 import QtGraphicalEffects 1.12
 
 Rectangle {
-    readonly property var noteNames: ["C", "D", "E", "F", "G", "A", "H"];
+    readonly property var noteNames: ["C", "D", "E", "F", "G", "A", "H", "c"];
 
     id: root;
 

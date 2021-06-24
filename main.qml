@@ -88,6 +88,25 @@ Window {
                 verticalAlignment: Text.AlignVCenter
                 text: audio.release.toString() + " ms";
             }
+
+            Text {
+                Layout.preferredWidth: 80;
+                horizontalAlignment: Text.AlignRight;
+                text: "Character:";
+            }
+            Slider {
+                Layout.fillWidth: true;
+                stepSize: 0.1
+                to: 1.0
+                from: -1.0
+                value: audio.character;
+                onValueChanged: audio.character = value;
+            }
+            Text {
+                Layout.preferredWidth: 80;
+                verticalAlignment: Text.AlignVCenter
+                text: (Math.round(50.0 * (audio.character + 1.0))).toString() + " %";
+            }
         }
 
         RowLayout {
@@ -164,6 +183,16 @@ Window {
             NoteButton {
                 id: noteH
                 noteIndex: 6
+                onNoteOn: {
+                    audio.noteOn(noteIndex);
+                }
+                onNoteOff: {
+                    audio.noteOff(noteIndex);
+                }
+            }
+            NoteButton {
+                id: noteh
+                noteIndex: 7
                 onNoteOn: {
                     audio.noteOn(noteIndex);
                 }

@@ -41,7 +41,7 @@ bool SynthVoice::Init(unsigned int sampleRate, unsigned int bufferSize)
     return true;
 }
 
-bool SynthVoice::NoteOn(double frequency, double gainLin, unsigned int attackMs, unsigned int releaseMs)
+bool SynthVoice::NoteOn(double frequency, double gainLin, unsigned int attackMs, unsigned int releaseMs, double character)
 {
     if (m_initialized == false)
     {
@@ -50,6 +50,7 @@ bool SynthVoice::NoteOn(double frequency, double gainLin, unsigned int attackMs,
 
     m_frequency = std::min(std::max(frequency, 20.0), 20000.0);
     m_gainLin = std::min(std::max(gainLin, 0.0), 1.0);
+    m_character = std::min(std::max(character, -1.0), 1.0);
 
     if (attackMs != m_attackMs)
     {
@@ -89,6 +90,8 @@ bool SynthVoice::ProcessAdd(double *buffer, unsigned numSamples)
     unsigned releaseSamps = m_releaseSamps.load();
 
     bool noteOn = m_noteOn.load();
+
+    double character = m_character.load();
 
     if (noteOn != m_curNoteOn)
     {
@@ -143,8 +146,30 @@ bool SynthVoice::ProcessAdd(double *buffer, unsigned numSamples)
         }
 
         p = 2.0 * M_PI * (double)m_phaseIdx / (double)phaseLen;
-        buffer[i] += m_envelope * gain * std::sin(p);
+        buffer[i] += m_envelope * gain * GetToneSample(p, character);
         m_phaseIdx = (m_phaseIdx + 1) % phaseLen;
     }
     return 0;
+}
+
+double SynthVoice::GetToneSample(double &phase, double &character)
+{
+    if (character >= 0.0) {
+        return (1.0 - character) * GetSine(phase) + character * GetRect(phase);
+    } else {
+        return (character + 1.0) * GetSine(phase) - character * GetTri(phase);
+    }
+}
+
+double SynthVoice::GetSine(double &phase)
+{
+    return 0.9 * std::sin(phase);
+}
+double SynthVoice::GetRect(double &phase)
+{
+    return 0.9 * phase >= M_PI ? -1.0 : 1.0;
+}
+double SynthVoice::GetTri(double &phase)
+{
+    return 0.9 * (phase - M_PI) / (2.0 * M_PI);
 }

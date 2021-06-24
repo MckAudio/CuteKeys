@@ -31,19 +31,25 @@ public:
     unsigned GetRelease() { return m_release.load(); };
     void SetRelease(unsigned release);
 
-    const double frequencies[7] = {
-        261.626,
-        293.665,
-        329.628,
-        349.228,
-        391.995,
-        440,
-        493.883
+    Q_PROPERTY(double character READ GetCharacter WRITE SetCharacter NOTIFY CharacterChanged);
+    double GetCharacter() { return m_character.load(); };
+    void SetCharacter(double character);
+
+    const double frequencies[8] = {
+        261.63,
+        293.66,
+        329.63,
+        349.23,
+        392.00,
+        440.00,
+        493.88,
+        523.25
     };
 signals:
     void GainChanged();
     void AttackChanged();
     void ReleaseChanged();
+    void CharacterChanged();
 
 public slots:
     void noteOn(unsigned note);
@@ -66,6 +72,7 @@ private:
 
     std::atomic<unsigned> m_attack;
     std::atomic<unsigned> m_release;
+    std::atomic<double> m_character;
 
     RtAudio m_audio;
     std::vector<RtAudio::DeviceInfo> m_devices;

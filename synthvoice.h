@@ -23,12 +23,17 @@ public:
     bool Init(unsigned sampleRate, unsigned bufferSize);
     bool IsIdle() { return m_noteState == ADSR_IDLE; };
 
-    bool NoteOn(double frequency, double gainLin, unsigned attackMs = 100, unsigned releaseMs = 1000);
+    bool NoteOn(double frequency, double gainLin, unsigned attackMs = 100, unsigned releaseMs = 1000, double character = 0.0);
     bool NoteOff();
 
     bool ProcessAdd(double *buffer, unsigned numSamples);
 
+
 private:
+    double GetToneSample(double &phase, double &character);
+    double GetSine(double &phase);
+    double GetRect(double &phase);
+    double GetTri(double &phase);
     bool m_initialized;
     unsigned m_sampleRate;
     unsigned m_bufferSize;
@@ -42,7 +47,7 @@ private:
 
     double m_envelope;
 
-    double m_character;
+    std::atomic<double> m_character;
 
     char m_noteState; // 0 - Attack, 1 - Decay, 2 - Sustain, 3 - Release, 4 - None
     std::atomic<bool> m_noteOn;

@@ -25,6 +25,7 @@ AudioHandler::AudioHandler(QObject *parent)
     , m_gainLin(0.1)
     , m_attack(100)
     , m_release(1000)
+    , m_character(0.0)
     , m_buffer(nullptr)
 {
 }
@@ -135,15 +136,20 @@ void AudioHandler::SetRelease(unsigned int release)
     m_release = release;
     emit ReleaseChanged();
 }
+void AudioHandler::SetCharacter(double character)
+{
+    m_character = std::max(std::min(character, 1.0), -1.0);
+    emit CharacterChanged();
+}
 
 void AudioHandler::noteOn(unsigned note)
 {
-    note = std::min(note, (unsigned) 6);
+    note = std::min(note, (unsigned) 7);
     for (auto &v : m_voices)
     {
         if (v.second->IsIdle())
         {
-            if (v.second->NoteOn(frequencies[note], m_gainLin.load(), m_attack.load(), m_release.load())) {
+            if (v.second->NoteOn(frequencies[note], m_gainLin.load(), m_attack.load(), m_release.load(), m_character.load())) {
                 v.first = note;
                 break;
             }
