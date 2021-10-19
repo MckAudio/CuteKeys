@@ -1,11 +1,11 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
-        <file>NoteButton.qml</file>
-        <file>SynthPage.qml</file>
-        <file>DrumPage.qml</file>
-        <file>DialControl.qml</file>
-        <file>DrumButton.qml</file>
-        <file>Painter.qml</file>
+        <file>ui/DialControl.qml</file>
+        <file>ui/DrumButton.qml</file>
+        <file>ui/DrumPage.qml</file>
+        <file>ui/main.qml</file>
+        <file>ui/NoteButton.qml</file>
+        <file>ui/Painter.qml</file>
+        <file>ui/SynthPage.qml</file>
     </qresource>
 </RCC>

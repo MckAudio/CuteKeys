@@ -1,6 +1,6 @@
-#include "audiohandler.h"
-#include "synthvoice.h"
-#include "drumhandler.h"
+#include "include/audiohandler.h"
+#include "include/synthvoice.h"
+#include "include/drumhandler.h"
 #include <cmath>
 
 int process(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void *userData)

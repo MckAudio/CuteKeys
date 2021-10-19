@@ -1,4 +1,4 @@
-#include "nativeobject.h"
+#include "include/nativeobject.h"
 #include <QDebug>
 
 NativeObject::NativeObject(QObject *parent) : QObject(parent)

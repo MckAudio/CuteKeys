@@ -8,11 +8,11 @@ CONFIG += console
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        audiohandler.cpp \
-        drumhandler.cpp \
-        main.cpp \
-        nativeobject.cpp \
-        synthvoice.cpp
+        source/main.cpp \
+        source/audiohandler.cpp \
+        source/drumhandler.cpp \
+        source/nativeobject.cpp \
+        source/synthvoice.cpp
 
 RESOURCES += qml.qrc
 
@@ -31,9 +31,18 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    audiohandler.h \
-    drumhandler.h \
-    nativeobject.h \
-    synthvoice.h
+    include/audiohandler.h \
+    include/drumhandler.h \
+    include/nativeobject.h \
+    include/synthvoice.h \
 
 QMAKE_LINK += -lrtaudio
+
+DISTFILES += \
+    ui/DialControl.qml \
+    ui/DrumButton.qml \
+    ui/DrumPage.qml \
+    ui/NoteButton.qml \
+    ui/Painter.qml \
+    ui/SynthPage.qml \
+    ui/main.qml

@@ -2,9 +2,9 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 
-#include "nativeobject.h"
-#include "audiohandler.h"
-#include "drumhandler.h"
+#include "include/nativeobject.h"
+#include "include/audiohandler.h"
+#include "include/drumhandler.h"
 
 int main(int argc, char *argv[])
 {
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     DrumHandler drumHandler;
     engine.rootContext()->setContextProperty("drummer", dynamic_cast<QObject*>(&drumHandler));
 
-    const QUrl url(QStringLiteral("qrc:/main.qml"));
+    const QUrl url(QStringLiteral("qrc:/ui/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)

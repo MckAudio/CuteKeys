@@ -1,4 +1,4 @@
-#include "synthvoice.h"
+#include "include/synthvoice.h"
 #include <algorithm>
 #include <cmath>
 
