@@ -7,6 +7,7 @@
 
 
 class SynthVoice;
+class DrumHandler;
 
 class AudioHandler : public QObject
 {
@@ -15,7 +16,7 @@ public:
     explicit AudioHandler(QObject *parent = nullptr);
     virtual ~AudioHandler();
 
-    bool Init();
+    bool Init(DrumHandler *drumHandler);
     void ProcessAudio(double *buffer, unsigned numSamples);
     unsigned GetSampleRate() { return m_sampleRate; };
 
@@ -79,6 +80,8 @@ private:
 
     std::vector<std::pair<int, SynthVoice*>> m_voices;
     double *m_buffer;
+
+    DrumHandler *m_drumHandler;
 };
 
 #endif // AUDIOHANDLER_H

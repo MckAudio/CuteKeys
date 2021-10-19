@@ -1,5 +1,6 @@
 #include "audiohandler.h"
 #include "synthvoice.h"
+#include "drumhandler.h"
 #include <cmath>
 
 int process(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void *userData)
@@ -58,12 +59,14 @@ AudioHandler::~AudioHandler()
     }
 }
 
-bool AudioHandler::Init()
+bool AudioHandler::Init(DrumHandler *drumHandler)
 {
     if (m_initialized)
     {
         return false;
     }
+
+    m_drumHandler = drumHandler;
 
     unsigned deviceCount = m_audio.getDeviceCount();
     m_devices.clear();
@@ -116,6 +119,11 @@ void AudioHandler::ProcessAudio(double *buffer, unsigned int numSamples)
             buffer[i*2] = m_buffer[i];
             buffer[i*2+1] = m_buffer[i];
         }
+    }
+
+    if (m_drumHandler != nullptr)
+    {
+        m_drumHandler->ProcessAudio(buffer, m_sampleRate, numSamples);
     }
 }
 

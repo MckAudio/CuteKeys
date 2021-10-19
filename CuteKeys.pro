@@ -9,6 +9,7 @@ CONFIG += console
 
 SOURCES += \
         audiohandler.cpp \
+        drumhandler.cpp \
         main.cpp \
         nativeobject.cpp \
         synthvoice.cpp
@@ -31,6 +32,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     audiohandler.h \
+    drumhandler.h \
     nativeobject.h \
     synthvoice.h
 

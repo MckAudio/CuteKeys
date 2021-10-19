@@ -2,5 +2,9 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>NoteButton.qml</file>
+        <file>SynthPage.qml</file>
+        <file>DrumPage.qml</file>
+        <file>DialControl.qml</file>
+        <file>DrumButton.qml</file>
     </qresource>
 </RCC>

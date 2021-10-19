@@ -3,16 +3,15 @@ import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
 Rectangle {
-    readonly property var noteNames: ["C", "D", "E", "F", "G", "A", "H", "c"];
-
     id: root;
 
     Layout.fillWidth: true;
     Layout.fillHeight: true;
-    Layout.minimumWidth: 40;
-    Layout.minimumHeight: 120;
+    Layout.minimumWidth: 50;
+    Layout.minimumHeight: 50;
     color: "#999999"
     radius: 5
+    property string title: "";
     property int noteIndex: 0;
     signal noteOn(int noteIdx);
     signal noteOff(int noteIdx);
@@ -21,11 +20,15 @@ Rectangle {
     gradient: Gradient {
         GradientStop {
             position: 0
+            color: "#aaaaaa"
+        }
+        GradientStop {
+            position: 0.3
             color: "#999999"
         }
         GradientStop {
             position: 1
-            color: "#555555"
+            color: "#777777"
         }
     }
     layer.enabled: true;
@@ -68,7 +71,7 @@ Rectangle {
         verticalAlignment: Text.AlignTop
         font.pointSize: 16;
         color: "#003377";
-        text: noteNames[Math.max(0, Math.min(noteNames.length - 1, noteIndex)).toString()];
+        text: title;
     }
 
     states: [
@@ -96,3 +99,9 @@ Rectangle {
         }
     ]
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

@@ -4,6 +4,7 @@
 
 #include "nativeobject.h"
 #include "audiohandler.h"
+#include "drumhandler.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +21,9 @@ int main(int argc, char *argv[])
     AudioHandler audioHandler;
     engine.rootContext()->setContextProperty("audio", dynamic_cast<QObject*>(&audioHandler));
 
+    DrumHandler drumHandler;
+    engine.rootContext()->setContextProperty("drummer", dynamic_cast<QObject*>(&drumHandler));
+
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
@@ -29,9 +33,7 @@ int main(int argc, char *argv[])
     engine.load(url);
 
     // Audio Handling
-    audioHandler.Init();
-
-
+    audioHandler.Init(&drumHandler);
 
     int ret = app.exec();
 
