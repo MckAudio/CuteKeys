@@ -6,5 +6,6 @@
         <file>DrumPage.qml</file>
         <file>DialControl.qml</file>
         <file>DrumButton.qml</file>
+        <file>Painter.qml</file>
     </qresource>
 </RCC>

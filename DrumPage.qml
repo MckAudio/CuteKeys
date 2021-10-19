@@ -39,6 +39,14 @@ ColumnLayout {
         DialControl {
             Layout.preferredWidth: 75
         }
+        Painter {
+            Layout.preferredHeight: 150
+            Layout.preferredWidth: 200
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+        }
+
+        /*
         Canvas {
             id: canvas
             Layout.preferredWidth: 120
@@ -51,7 +59,7 @@ ColumnLayout {
 
                 ctx.fillRect(0, 0, width, height)
             }
-        }
+        }*/
     }
 
     GridLayout {
