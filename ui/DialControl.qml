@@ -3,11 +3,14 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 GridLayout {
+    id: dial
     property string name: "control"
     property string unit: "%"
     property real value: 50.0
     property real minimumValue: 0.0
     property real maximumValue: 100.0
+
+    signal dialChanged(real newValue)
 
     columns: 2
     rows: 2
@@ -16,25 +19,25 @@ GridLayout {
         Layout.preferredHeight: 75
         Layout.preferredWidth: 75
         Layout.fillWidth: true
-        value: parent.value
+        value: dial.value
         Layout.columnSpan: 2
         from: minimumValue
         to: maximumValue
-        onValueChanged: {
-            parent.value = value
-        }
         inputMode: "Vertical"
+        onMoved: {
+            dialChanged(value)
+        }
     }
     Text {
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignRight
-        text: parent.name
+        text: dial.name
     }
     Text {
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignLeft
         font.italic: true
-        text: parent.value.toFixed(1) + " " + parent.unit
+        text: dial.value.toFixed(1) + " " + dial.unit
 
     }
 }

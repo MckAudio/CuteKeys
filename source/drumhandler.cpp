@@ -1,4 +1,4 @@
-#include "include/drumhandler.h"
+#include "drumhandler.h"
 
 DrumHandler::DrumHandler(QObject *parent) : QObject(parent), m_log(""), m_pad(0)
 {

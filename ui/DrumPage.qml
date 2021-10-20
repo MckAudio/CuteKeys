@@ -35,9 +35,25 @@ ColumnLayout {
         }
         DialControl {
             Layout.preferredWidth: 75
+            value: audio.character
+            minimumValue: -1.0
+            maximumValue: 1.0
+            onDialChanged: function(val) {
+                audio.character = val
+                console.log(val)
+            }
+            name: "Character"
         }
         DialControl {
             Layout.preferredWidth: 75
+            value: audio.character
+            minimumValue: -1.0
+            maximumValue: 1.0
+            onDialChanged: function(val) {
+                audio.character = val
+                console.log(val)
+            }
+            name: "Character"
         }
         Painter {
             Layout.preferredHeight: 150

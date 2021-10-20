@@ -2,9 +2,9 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 
-#include "include/nativeobject.h"
-#include "include/audiohandler.h"
-#include "include/drumhandler.h"
+#include "nativeobject.h"
+#include "audiohandler.h"
+#include "drumhandler.h"
 
 int main(int argc, char *argv[])
 {

@@ -22,7 +22,7 @@ ColumnLayout {
             to: 0
             from: -60
             value: audio.gain;
-            onValueChanged: audio.gain = value;
+            onMoved: audio.gain = value;
         }
         Text {
             id: gainLabel;
@@ -43,7 +43,7 @@ ColumnLayout {
             to: 2000
             from: 0
             value: audio.attack;
-            onValueChanged: audio.attack = value;
+            onMoved: audio.attack = value;
         }
         Text {
             id: attackLabel;
@@ -64,7 +64,7 @@ ColumnLayout {
             to: 2000
             from: 0
             value: audio.release;
-            onValueChanged: audio.release = value;
+            onMoved: audio.release = value;
         }
         Text {
             id: releaseLabel;
@@ -84,7 +84,7 @@ ColumnLayout {
             to: 1.0
             from: -1.0
             value: audio.character;
-            onValueChanged: audio.character = value;
+            onMoved: audio.character = value;
         }
         Text {
             Layout.preferredWidth: 80;
